@@ -7,7 +7,7 @@ import Loading from '../components/Loading';
 
 const Layout = () => {
   const user = dummyUserData;
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   return user ? (
     <div className='w-full h-screen flex'>
       <SideBar sidebarOpen={sidebarOpen} setSideBarOpen={setSidebarOpen}/>
@@ -15,8 +15,8 @@ const Layout = () => {
         <Outlet />
       </div>
       {sidebarOpen ? 
-      <X className='absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 cursor-pointer sm:hidden' onClick={() => setSidebarOpen(false)}/> :
-      <Menu className='absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 cursor-pointer sm:hidden' onClick={() => setSidebarOpen(true)}/>
+      <X className='absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 cursor-pointer ' onClick={() => setSidebarOpen(false)}/> :
+      <Menu className='absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 cursor-pointer ' onClick={() => setSidebarOpen(true)}/>
       }
     </div>
   ) : (
