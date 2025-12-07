@@ -3,6 +3,7 @@ import { dummyPostsData } from '../assets/assets';
 import Loading from '../components/Loading';
 import StoriesBar from '../components/StoriesBar';
 import PostCard from '../components/PostCard';
+import RecentMessages from '../components/RecentMessages';
 
 const Feed = () => {
   const [feeds,setFeeds] = useState([]);
@@ -30,11 +31,8 @@ const Feed = () => {
         </div>
       </div>
     {/* Right Sidebar */}
-      <div className='w-[280px]'>
-        <div>
-          Sponsored
-        </div>
-        <h1>Recent Messages</h1>
+      <div className='w-[420px]'>
+        <RecentMessages />
       </div>
     </div>
   ) : <Loading />
