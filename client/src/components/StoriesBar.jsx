@@ -3,6 +3,7 @@ import { dummyStoriesData } from '../assets/assets';
 import { CirclePlus } from 'lucide-react';
 import moment from 'moment';
 import StoryModal from './StoryModal';
+import StoryViewer from './StoryViewer';
 
 const StoriesBar = () => {
   const [stories,setStories] = useState([]);
@@ -27,10 +28,10 @@ const StoriesBar = () => {
         </div>
         {
           stories.map((story,index)=>(
-            <div key={index} className='relative rounded-lg shadow-md w-26 cursor-pointer transition-all duration-300 bg-gradient-to-b from-indigo-400 to-purple-300 hover:shadow-lg hover:scale-105 active:scale-95 flex flex-col items-center gap-2 p-2'>
+            <div key={index} className='relative rounded-lg shadow-md w-26 cursor-pointer transition-all duration-300 bg-gradient-to-b from-indigo-400 to-purple-300 hover:shadow-lg hover:scale-105 active:scale-95 flex flex-col items-center gap-2 p-2' onClick={() => setViewStory(story)}>
             <img src={story.user.profile_picture} className='size-8 absolute top-3 left-3 z-10 rounded-full ring ring-gray-100 shadow'/>
             <p className='absolute top-18 text-center text-black text-sm truncate max-w-24'>{story.content}</p>
-            <p className='text-black absolute bottom-1 right-2 z-10 text-xs'>{moment(story.createdAt).fromNow()}</p>
+            <p className='text-white absolute bottom-1 right-2 z-10 text-xs'>{moment(story.createdAt).fromNow()}</p>
             {
               story.media_type !== 'text' && 
               <div className='absolute inset-0 z-1 rounded-lg bg-black overflow-hidden'>
@@ -46,6 +47,7 @@ const StoriesBar = () => {
         }
       </div>
       {showModal && <StoryModal setShowModal={setShowModal} fetchStories={getStories} />}
+      {viewStory && <StoryViewer viewStory={viewStory} setViewStory={setViewStory} />}
     </div>
   )
 }
