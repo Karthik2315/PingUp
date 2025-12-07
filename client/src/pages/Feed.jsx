@@ -21,7 +21,7 @@ const Feed = () => {
   return !loading ?  (
     <div className='w-full flex justify-between min-h-screen  py-10'>
     {/* stories and posts here */}
-      <div className='w-[950px]'>
+      <div className='w-[800px]'>
         <StoriesBar />
         <div className='p-4 space-y-6'>
           {feeds.map((post,index)=>(

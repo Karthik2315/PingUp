@@ -20,15 +20,15 @@ const StoriesBar = () => {
     fetch();
   },[]);
   return (
-    <div className='w-full no-scrollbar overflow-x-auto px-4 '>
+    <div className='max-w-[700px] no-scrollbar overflow-x-auto px-4 '>
       <div className='flex gap-4 pb-5 pt-4'>
-        <div className='flex flex-col py-10 px-4 rounded-2xl  gap-1 items-center justify-center border-2 border-dashed border-blue-500 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300 hover:group' onClick={() => setShowModal(true)}>
+        <div className='shrink-0 flex flex-col py-10 px-4 rounded-2xl  gap-1 items-center justify-center border-2 border-dashed border-blue-500 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300 hover:group' onClick={() => setShowModal(true)}>
           <CirclePlus className='size-10 text-white fill-indigo-500'/>
           <p className='text-[13px] font-medium text-slate-700 hover:scale-105'>Create Story</p>
         </div>
         {
           stories.map((story,index)=>(
-            <div key={index} className='relative rounded-lg shadow-md w-26 cursor-pointer transition-all duration-300 bg-gradient-to-b from-indigo-400 to-purple-300 hover:shadow-lg hover:scale-105 active:scale-95 flex flex-col items-center gap-2 p-2' onClick={() => setViewStory(story)}>
+            <div key={index} className='shrink-0 relative rounded-lg shadow-md w-26 cursor-pointer transition-all duration-300 bg-gradient-to-b from-indigo-400 to-purple-300 hover:shadow-lg hover:scale-105 active:scale-95 flex flex-col items-center gap-2 p-2' onClick={() => setViewStory(story)}>
             <img src={story.user.profile_picture} className='size-8 absolute top-3 left-3 z-10 rounded-full ring ring-gray-100 shadow'/>
             <p className='absolute top-18 text-center text-black text-sm truncate max-w-24'>{story.content}</p>
             <p className='text-white absolute bottom-1 right-2 z-10 text-xs'>{moment(story.createdAt).fromNow()}</p>
