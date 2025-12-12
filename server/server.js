@@ -3,7 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 import connectDB from './config/db.js';
-import {inngest,functions} from '/inngest/index.js';
+import {inngest,functions} from './inngest/index.js';
 import { serve } from "inngest/express";
 
 const app = express();
