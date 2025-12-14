@@ -6,6 +6,7 @@ import connectDB from './config/db.js';
 import {inngest,functions} from './inngest/index.js';
 import { serve } from "inngest/express";
 import { clerkMiddleware } from '@clerk/express'
+import userRouter from './routes/userRouter.js';
 
 
 const app = express();
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
   res.send('Hello from PingUp server!');
 });
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/user",userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
