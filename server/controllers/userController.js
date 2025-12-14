@@ -19,8 +19,8 @@ export const getUserData = async(req,res) => {
 
 export const updateUserData = async(req,res) => {
   try {
-    const {userId} = req.auth();
-    const {username,bio,location,full_name} = req.body;
+    const {userId} = await req.auth();
+    let {username,bio,location,full_name} = req.body;
     const tempUser = await User.findById(userId);
     !username && (username = tempUser.username);
     if(tempUser.username !== username)
@@ -31,7 +31,7 @@ export const updateUserData = async(req,res) => {
         username = tempUser.username; // Revert to old username
       }
     }
-    updatedData = {
+    const updatedData = {
       username,
       bio,
       full_name,
