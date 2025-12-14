@@ -2,6 +2,7 @@ import { format } from "path";
 import imagekit from "../config/imageKit.js";
 import User from "../models/UserModel.js";
 import fs from 'fs';
+import Connection from "../models/ConnectionModel.js";
 
 export const getUserData = async(req,res) => {
   try {
@@ -147,6 +148,81 @@ export const unfollowUser = async(req,res) => {
     res.status(200).json({success:true,message: "User unfollowed successfully"});
   } catch (error) {
     console.error("Error unfollowing user:", error);
+    res.status(500).json({success:false,message: "Internal Server Error"});
+  }
+}
+
+export const sendConnectionRequest = async(req,res) =>{
+  try {
+    const {userId} = req.auth();
+    const {id} = req.body;
+    const last24Hours = new Date(Date.now() - 24*60*60*1000);
+    const connectionRequests = await Connection.find({from_user_id:userId,createdAt:{$gt:last24Hours}});
+    if(connectionRequests.length >= 20)
+    {
+      return res.status(429).json({success:false,message: "Connection request limit reached. Please try again later."});
+    }
+    const connection1 = await Connection.findOne({from_user_id:userId,to_user_id:id});
+    if(connection1)
+    {
+      if(connection1.status === "accepted")
+      {
+        return res.status(400).json({success:false,message: "You are already connected with this user"});
+      }
+      return res.status(400).json({success:false,message: "Connection request already sent"});
+    }
+    const connection2 = await Connection.findOne({from_user_id:id,to_user_id:userId});
+    if(connection2)
+    {
+      if(connection2.status === "accepted")
+      {
+        return res.status(400).json({success:false,message: "You are already connected with this user"});
+      }
+      return res.status(400).json({success:false,message: "User has already sent you a connection request"});
+    }
+    await Connection.create({from_user_id:userId,to_user_id:id});
+    res.status(200).json({success:true,message: "Connection request sent successfully"});
+  } catch (error) {
+    console.error("Error sending connection request:", error);
+    res.status(500).json({success:false,message: "Internal Server Error"});
+  }
+}
+
+export const getUserConnections = async(req,res) => {
+  try {
+    const {userId} = req.auth();
+    const user = await User.findById(userId).populate('connections followers following');
+    const connections = user.connections;
+    const followers = user.followers;
+    const following = user.following;
+    const pendingConnections = (await Connection.find({to_user_id:userId,status:"pending"}).populate('from_user_id')).map(conn => conn.from_user_id);
+    res.status(200).json({success:true,connections,followers,following,pendingConnections,message: "User connections fetched successfully"});
+  } catch (error) {
+    console.error("Error fetching user connections:", error);
+    res.status(500).json({success:false,message: "Internal Server Error"});
+  }
+}
+
+export const acceptConnectionRequest = async(req,res) => {
+  try {
+    const {userId} = req.auth();
+    const {id} = req.body;
+    const connection = await Connection.findOne({from_user_id:id,to_user_id:userId,status:"pending"});
+    if(!connection)
+    {
+      return res.status(404).json({success:false,message: "Connection request not found"});
+    }
+    const user = await User.findById(userId);
+    const fromUser = await User.findById(id);
+    user.connections.push(id);
+    fromUser.connections.push(userId);
+    await user.save();
+    await fromUser.save();
+    connection.status = "accepted";
+    await connection.save();
+    res.status(200).json({success:true,message: "Connection request accepted successfully"});
+  } catch (error) {
+    console.error("Error accepting connection request:", error);
     res.status(500).json({success:false,message: "Internal Server Error"});
   }
 }
