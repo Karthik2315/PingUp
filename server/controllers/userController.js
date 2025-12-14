@@ -1,6 +1,6 @@
 import { format } from "path";
 import imagekit from "../config/imageKit";
-import User from "../models/UserModel";
+import User from "../models/UserModel.js";
 import fs from 'fs';
 
 export const getUserData = async(req,res) => {
