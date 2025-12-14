@@ -1,7 +1,7 @@
 import { Inngest } from "inngest";
 import User from "../models/UserModel.js";
-import { Connection } from "mongoose";
 import sendEmail from "../config/nodeMailer.js";
+import Connection from "../models/ConnectionModel.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "pingUp-app" });
