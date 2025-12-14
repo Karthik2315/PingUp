@@ -1,5 +1,5 @@
 import { format } from "path";
-import imagekit from "../config/imageKit";
+import imagekit from "../config/imageKit.js";
 import User from "../models/UserModel.js";
 import fs from 'fs';
 
