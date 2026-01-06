@@ -7,7 +7,7 @@ import User from "../models/UserModel.js";
 export const addPost = async(req,res) => {
   try {
     const {userId} = await req.auth();
-    const {content,post_type} = req.body();
+    const {content,post_type} = req.body;
     const images = req.files;
     let images_urls = [];
     if(images.length)

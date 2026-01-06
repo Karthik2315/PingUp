@@ -13,13 +13,13 @@ import Layout from './pages/Layout'
 import {Toaster} from 'react-hot-toast'
 const App = () => {
   const {user} = useUser()
-  /*const {getToken} = useAuth()
+  const {getToken} = useAuth()
   useEffect(()=>{
     if(user)
     {
       getToken().then((token) => console.log(token));
     }
-  },[user]) */
+  },[user]) 
   return (
     <>
       <Toaster />
