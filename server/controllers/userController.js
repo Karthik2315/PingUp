@@ -4,6 +4,7 @@ import User from "../models/UserModel.js";
 import fs from 'fs';
 import Connection from "../models/ConnectionModel.js";
 import Post from "../models/PostModel.js";
+import { inngest } from "../inngest/index.js";
 
 export const getUserData = async(req,res) => {
   try {
@@ -181,7 +182,13 @@ export const sendConnectionRequest = async(req,res) =>{
       }
       return res.status(400).json({success:false,message: "User has already sent you a connection request"});
     }
-    await Connection.create({from_user_id:userId,to_user_id:id});
+    const newConnection = await Connection.create({from_user_id:userId,to_user_id:id});
+    await inngest.send({
+      name:"app/connection-request",
+      data:{
+        connectionId:newConnection._id
+      }
+    })
     res.status(200).json({success:true,message: "Connection request sent successfully"});
   } catch (error) {
     console.error("Error sending connection request:", error);

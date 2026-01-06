@@ -2,6 +2,7 @@ import fs from 'fs';
 import imagekit from '../config/imageKit.js';
 import Story from '../models/StoryModel.js';
 import User from '../models/UserModel.js';
+import { inngest } from '../inngest/index.js';
 
 
 export const addStory = async(req,res) => {
@@ -10,7 +11,7 @@ export const addStory = async(req,res) => {
     const {content,media_type,background_color} = req.body;
     const media = req.file;
     let media_url = '';
-    if (media_type == 'image' || media_type == 'video') {
+    if (media_type === 'image' || media_type === 'video') {
       const fileBuffer = fs.readFileSync(media.path)
       const response = await imagekit.upload({
           file: fileBuffer,
@@ -25,6 +26,14 @@ export const addStory = async(req,res) => {
       media_type,
       background_color
     })
+
+    await inngest.send({
+      name:"app/story.delete",
+      data: {
+        storyId:story._id
+      }
+    })
+
     res.status(200).json({
       success:true,
       message:"Story added successfully"
