@@ -3,6 +3,7 @@ import imagekit from "../config/imageKit.js";
 import User from "../models/UserModel.js";
 import fs from 'fs';
 import Connection from "../models/ConnectionModel.js";
+import Post from "../models/PostModel.js";
 
 export const getUserData = async(req,res) => {
   try {
@@ -221,6 +222,30 @@ export const acceptConnectionRequest = async(req,res) => {
     connection.status = "accepted";
     await connection.save();
     res.status(200).json({success:true,message: "Connection request accepted successfully"});
+  } catch (error) {
+    console.error("Error accepting connection request:", error);
+    res.status(500).json({success:false,message: "Internal Server Error"});
+  }
+}
+
+export const getUserProfiles = async(req,res) => {
+  try {
+    const {profileId} = req.body;
+    const profile = await User.findById(profileId);
+    if(!profile)
+    {
+      return res.status(404).json({
+        success:false,
+        message:"User was not found"
+      })
+    }
+    const posts = Post.find({user:profileId}).populate('user');
+    res.status(200).json({
+      success:true,
+      profile,
+      posts,
+      message:"Got the user"
+    })
   } catch (error) {
     console.error("Error accepting connection request:", error);
     res.status(500).json({success:false,message: "Internal Server Error"});
