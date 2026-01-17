@@ -3,6 +3,7 @@ import User from "../models/UserModel.js";
 import sendEmail from "../config/nodeMailer.js";
 import Connection from "../models/ConnectionModel.js";
 import Story from "../models/StoryModel.js";
+import Message from "../models/MessageModel.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "pingUp-app" });
@@ -116,7 +117,41 @@ const deleteStory = inngest.createFunction(
     })
   }
 )
+
+const sendNotificationOfUnseenMessages = inngest.createFunction(
+  {id:'send-unseen-messages-notification'},
+  {cron:'TZ=Asia/Kolkata every day at 09:00'},
+  async({step}) => {
+    const messages = await Message.find({seen:false}).populate('to_user_id');
+    const unseenCount = {};
+    messages.map(msg => {
+      unseenCount[msg.to_user_id._id] = unseenCount[msg.to_user_id._id] ? unseenCount[msg.to_user_id._id] + 1 : 1;
+    })
+    for (const userId in unseenCount) {
+      const user = await User.findById(userId);
+
+      const subject = `📬 You have ${unseenCount[userId]} unseen messages`;
+
+      const body = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Hi ${user.full_name},</h2>
+          <p>You have ${unseenCount[userId]} unseen messages</p>
+          <p>Click <a href="${process.env.FRONTEND_URL}/messages" style="color: #10b981;
+          ">here</a> to view them</p>
+          <br/>
+          <p>Thanks,<br/>PingUp - Stay Connected</p>
+        </div>
+      `;
+      
+      // You would typically call your email service here, e.g.:
+      // await sendEmail(user.email, subject, body);
+      await sendEmail({to:user.email,subject,body});
+    }
+    return {message:"Notifications sent" };
+  }
+)
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
-  syncUserCreation,syncUserUpdation,syncUserDeletion,sendNewConnectionRequest,deleteStory
+  syncUserCreation,syncUserUpdation,syncUserDeletion,sendNewConnectionRequest,deleteStory,sendNotificationOfUnseenMessages
 ];
