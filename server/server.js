@@ -9,6 +9,7 @@ import { clerkMiddleware } from '@clerk/express'
 import userRouter from './routes/userRouter.js';
 import postRouter from './routes/postRouter.js';
 import storyRouter from './routes/storyRouter.js';
+import messageRouter from './routes/messageRouter.js';
 
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/user",userRouter);
 app.use("/api/post",postRouter);
 app.use('/api/story',storyRouter)
+app.use('/api/message',messageRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
