@@ -1,28 +1,56 @@
 import React, { useEffect, useState } from 'react'
 import {Link, useParams} from 'react-router-dom'
-import { dummyPostsData, dummyUserData } from '../assets/assets';
 import Loading from '../components/Loading';
 import UserProfileInfo from '../components/UserProfileInfo';
 import PostCard from '../components/PostCard';
 import moment from 'moment';
 import ProfileModal from '../components/ProfileModal';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../api/axios';
+import {toast} from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
+  const currentUser = useSelector((state) => state.user.value)
+  const {getToken} = useAuth()
   const {profileId} = useParams();
   const [user,setUser] = useState(null);
   const [posts,setPosts] = useState([]);
   const [activeTab,setActiveTab] = useState('posts');
   const [showEdit,setShowEdit] = useState(false);
-  const fetchData = async() => {
-    setUser(dummyUserData);
-    setPosts(dummyPostsData);
+  const fetchData = async(profileId) => {
+    const token = await getToken();
+    try {
+          const {data} = await api.post(`/api/user/profiles`,{profileId},{
+            headers:{
+              Authorization:`Bearer ${token}`
+            }
+          })
+          if(data.success){
+            setUser(data.profile);
+            setPosts(data.posts);
+          }else{
+            toast.error(data.message);
+          }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
   }
   useEffect(() => {
-    const temp = async() => {
-      await fetchData();
+    if(profileId)
+    {
+      const temp = async() => {
+        await fetchData(profileId);
+      }
+      temp();
+    }else{
+      const temp = async() => {
+        await fetchData(currentUser._id);
+      }
+      temp();
     }
-    temp();
-  },[]);
+
+  },[profileId,currentUser]);
   return user ? (
     <div className='relative min-h-screen overflow-y-scrollbar no-scrollbar bg-gray-50 p-6'>
       <div className='max-w-3xl mx-auto'>

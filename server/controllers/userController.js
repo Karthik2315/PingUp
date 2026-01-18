@@ -241,12 +241,13 @@ export const getUserProfiles = async(req,res) => {
     const profile = await User.findById(profileId);
     if(!profile)
     {
+      console.log("uckk")
       return res.status(404).json({
         success:false,
         message:"User was not found"
       })
     }
-    const posts = Post.find({user:profileId}).populate('user');
+    const posts = await Post.find({user:profileId}).populate('user');
     res.status(200).json({
       success:true,
       profile,
