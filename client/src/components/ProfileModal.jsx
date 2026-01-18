@@ -55,7 +55,7 @@ const ProfileModal = ({setShowEdit}) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Location
               </label>
-              <input type="text" className='w-full p-3 border border-gray-200 rounded-lg text-[14px]' placeholder='Please enter your full name' onChange={(e) => setForm({...form, location: e.target.value})} value={form.location}/>
+              <input type="text" className='w-full p-3 border border-gray-200 rounded-lg text-[14px]' placeholder='Please enter your location' onChange={(e) => setForm({...form, location: e.target.value})} value={form.location}/>
             </div>
             <div className='flex justify-end space-x-3 pt-6'>
               <button onClick={() => setShowEdit(false)} type='button' className='px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all hover:scale-105 active:scale-95  duration-200 cursor-pointer'>Cancel</button>
