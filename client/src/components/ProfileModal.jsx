@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { dummyUserData } from '../assets/assets'
+import { useSelector } from 'react-redux';
 
 const ProfileModal = ({setShowEdit}) => {
-  const user = dummyUserData;
+  const user = useSelector((state) => state.user.value);
   const [form,setForm] = useState({
     username: user.username,
     bio: user.bio,
