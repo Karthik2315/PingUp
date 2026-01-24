@@ -1,16 +1,40 @@
-import React, { use, useState } from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 import { BadgeCheck, Heart, MessageCircle, Share2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import {useAuth} from '@clerk/clerk-react'
+import {toast} from 'react-hot-toast';
+import api from '../api/axios';
+
 
 const PostCard = ({post}) => {
   const postWithHashtags = post.content.replace(/#(\w+)/g, '<span class="text-blue-500 cursor-pointer">#$1</span>');  
   const [likes,setLikes] = useState(post.likes_count);
   const currentUser =  useSelector((state) => state.user.value);
   const navigate = useNavigate();
+  const {getToken} = useAuth();
   const handleLike = async() => {
-
+    try {
+      const token = await getToken();
+      const {data} = await api.post('/api/post/like',{postId:post._id},{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      });
+      if(data.success){
+        toast.success(data.message);
+        setLikes(prev => {
+          if(prev.includes(currentUser._id)){
+            return prev.filter(id => id !== currentUser._id);
+          }else{
+            return [...prev,currentUser._id];
+          }
+        })
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
   }
   return (
     <div className='bg-white rounded-xl shadow p-4 space-y-4 w-full max-w-2xl'>
