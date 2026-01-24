@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import {useAuth} from '@clerk/clerk-react'
+import { updateUser } from '../features/users/userSlice';
+import toast from 'react-hot-toast';
 
 const ProfileModal = ({setShowEdit}) => {
   const user = useSelector((state) => state.user.value);
+  const dispatch = useDispatch();
+  const {getToken} = useAuth();
   const [form,setForm] = useState({
     username: user.username,
     bio: user.bio,
@@ -13,14 +18,28 @@ const ProfileModal = ({setShowEdit}) => {
   })
   const handleSaveProfile = async(e) => {
     e.preventDefault();
-
+    try {
+      const token = await getToken();
+      const userData = new FormData();
+      const {username,bio,location,full_name,profile_picture,cover_photo} = form;
+      userData.append('username',username);
+      userData.append('bio',bio);
+      userData.append('location',location);
+      userData.append('full_name',full_name);
+      profile_picture && userData.append('profile',profile_picture);
+      cover_photo && userData.append('cover',cover_photo);
+      dispatch(updateUser({userData,token}));
+      setShowEdit(false);
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
   return (
     <div className='fixed flex items-center justify-center min-h-screen inset-0 z-[110] bg-black/50'> 
       <div className='w-2xl mx-auto'>
         <div className='bg-white rounded-lg shadow p-6'>
           <h1 className='text-2xl font-semibold text-gray-900 mb-4'>Edit Profile</h1>
-          <form onSubmit={handleSaveProfile} className='space-y-4'>
+          <form onSubmit={e=> toast.promise(handleSaveProfile(e),{loading:'Saving...'})} className='space-y-4'>
             <div className='flex mx-20 items-center justify-between gap-3'>
               <label htmlFor='profile_picture' className='block text-sm font-medium text-gray-700 mb-1'>
                 Profile Picture
