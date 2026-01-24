@@ -1,16 +1,48 @@
-import React, {  useState } from 'react'
+import React, {  use, useState } from 'react'
 import { Image, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
+import {useAuth} from '@clerk/clerk-react'
+import api from '../api/axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePost = () => {
   const [content,setContent] = useState('');
   const [images,setImages] = useState([]);
   const [loading,setLoading] = useState(false);
   const user = useSelector((state) => state.user.value);
-
+  const navigate = useNavigate();
+  const {getToken} = useAuth();
   const handleSubmit = async() => {
-
+    if(!images.length && !content){
+      return toast.error('Post cannot be empty');
+    }
+    setLoading(true);
+    const postType = images.length && content ? 'text_with_image': images.length ? 'image':'text';
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('content',content);
+      formData.append('post_type',postType);
+      images.map((image) => {
+        formData.append('image',image);
+      })
+      const {data} = await api.post('/api/post/add',formData,{
+        headers:{
+          'Authorization': `Bearer ${token}`,
+        }
+      })
+      if(data.success){
+        navigate('/');
+      }else{
+        console.log(data.message)
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }finally{
+      setLoading(false);
+    }
   }
 
   return (
