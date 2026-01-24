@@ -14,12 +14,44 @@ const StoryModal = ({setShowModal,fetchStories}) => {
   const [media, setMedia] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
 
+  const MAX_MEDIA_DURATION = 60;
+  const MAX_MEDIA_SIZE_MB = 50;
+
+
   const handleMediaUpload = (e) => {
     const file = e.target.files[0];
     if(file)
     {
-      setMedia(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      if(file.type.startsWith("video")){
+        if(file.size > MAX_MEDIA_SIZE_MB * 1024 * 1024){
+          toast.error(`Video size should not exceed ${MAX_MEDIA_SIZE_MB} MB`);
+          setMedia(null);
+          setPreviewUrl(null);
+          return;
+        }
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+          window.URL.revokeObjectURL(video.src);
+          if(video.duration > MAX_MEDIA_DURATION){
+            toast.error(`Video duration should not exceed ${MAX_MEDIA_DURATION} seconds`);
+            setMedia(null);
+            setPreviewUrl(null);
+            return;
+          }else{
+            setMedia(file);
+            setPreviewUrl(URL.createObjectURL(file));
+            setText("");
+            setMode("media");
+          }
+        }
+        video.src = URL.createObjectURL(file);
+      }else if(file.type.startsWith("image")){
+        setMedia(file);
+        setPreviewUrl(URL.createObjectURL(file));
+        setText("");
+        setMode("media");
+      }
     }
   }
   const {getToken} = useAuth()
@@ -29,7 +61,7 @@ const StoryModal = ({setShowModal,fetchStories}) => {
     {
       throw new Error("Please Enter some text");
     }
-    let formData = new formData();
+    let formData = new FormData();
     formData.append('content',text);
     formData.append('media_type',media_type);
     formData.append('media',media);
@@ -80,12 +112,10 @@ const StoryModal = ({setShowModal,fetchStories}) => {
         <div className='flex gap-2 mt-2 items-center justify-between'>
           <button className={`flex items-center w-1/2 rounded-md cursor-pointer hover:scale-105 transition-all duration-300 active:scale-95 py-2 gap-2 ${mode === 'text' ? 'bg-white text-black' : 'bg-black/20'} justify-center`} onClick={() => {setMode('text');setMedia(null);setPreviewUrl(null)}}><TextAlignCenter className='size-4'/>Text</button>
           <label className={`flex items-center w-1/2 rounded-md cursor-pointer hover:scale-105 transition-all duration-300 active:scale-95 py-2 gap-2 ${mode === 'media' ? 'bg-white text-black' : 'bg-black/20'} justify-center`}>
-          <input onChange={(e) => {handleMediaUpload(e);setMode('media')}} type='file' accept='image/*,video/*' className='hidden'/><Upload className='size-4'/>Photo/Video</label>
+          <input onChange={handleMediaUpload} type='file' accept='image/*,video/*' className='hidden'/><Upload className='size-4'/>Photo/Video</label>
         </div>
         <button onClick={() => toast.promise(handleCreateStory(),{
           loading: 'Creating Story...',
-          success: <p>Story Added</p>,
-          error: e => <p>{e.message}</p>,
         })} className='flex items-center justify-center gap-2 text-white w-full py-2 mt-3 rounded-md bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 transition-all duration-300 active:scale-95 cursor-pointer' ><Sparkles className='size-6 fill-white' />Create Story</button>
       </div>
     </div>
