@@ -1,6 +1,9 @@
 import { ArrowLeft, Sparkles, TextAlignCenter, Upload } from 'lucide-react'
 import React, { useState } from 'react'
 import { toast } from 'react-hot-toast';
+import {useAuth} from '@clerk/clerk-react'
+import api from '../api/axios';
+
 
 const StoryModal = ({setShowModal,fetchStories}) => {
 
@@ -19,9 +22,33 @@ const StoryModal = ({setShowModal,fetchStories}) => {
       setPreviewUrl(URL.createObjectURL(file));
     }
   }
-
+  const {getToken} = useAuth()
   const handleCreateStory = async() => {
-
+    const media_type = mode === "media" ? media?.type.startsWith('image') ? 'image':'video':'text';
+    if(media_type === 'text' && !text)
+    {
+      throw new Error("Please Enter some text");
+    }
+    let formData = new formData();
+    formData.append('content',text);
+    formData.append('media_type',media_type);
+    formData.append('media',media);
+    formData.append('background_color',background);
+    const token = await getToken();
+    try {
+      const {data} = await api.post('/api/story/create',formData,{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+      }});
+      if(data.success){
+        setShowModal(false);
+        fetchStories();
+      }else{
+        console.log(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
 
   return (
