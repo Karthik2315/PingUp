@@ -1,24 +1,45 @@
-import React, { useState } from 'react'
-import { dummyConnectionsData } from '../assets/assets'
+import React, { useEffect, useState } from 'react'
 import { SearchIcon } from 'lucide-react'
 import UserCard from '../components/UserCard'
+import { useAuth } from '@clerk/clerk-react'
 import Loading from '../components/Loading'
+import api from '../api/axios'
+import { useDispatch } from 'react-redux'
+import { fetchUser } from '../features/users/userSlice'
 
 const Discover = () => {
   const [input, setInput] = useState('')
-  const [users, setUsers] = useState(dummyConnectionsData)
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
-
+  const {getToken} = useAuth()
+  const dispatch = useDispatch();
   const handleSearch = async (e) => {
     if (e.key === 'Enter') {
-      setUsers([])
-      setLoading(true)
-      setTimeout(() => {
-        setUsers(dummyConnectionsData)
-        setLoading(false)
-      }, 1000)
+      try {
+        setUsers([]);
+        setLoading(true);
+        const token = await getToken();
+        const {data} = await api.post('/api/user/discover',{input},{
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if(data.success){
+          setUsers(data.users);
+          setLoading(false);
+        }else{
+          console.log('Error searching users:', data.message);
+          setLoading(false);
+        }
+        setInput('');
+      } catch (error) {
+        console.log('Error searching users:', error)
+      }
     }
   }
+  useEffect(()=>{
+    getToken().then((token) => dispatch(fetchUser(token)));
+  },[])
   return (
   <div className='min-h-screen bg-gradient-to-b from-slate-50 to-white'>
     <div className='max-w-6xl mx-auto p-6'>
