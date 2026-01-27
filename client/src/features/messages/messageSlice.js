@@ -6,7 +6,7 @@ const initialState = {
 }
 
 export const fetchMessages = createAsyncThunk('messages/fetchMessages',async({token,id})=>{
-  const {data} = await api.post('/api/messages/get',{to_user_id:id},{
+  const {data} = await api.post('/api/message/get',{to_user_id:id},{
     headers:{
       Authorization:`Bearer ${token}`
     }
@@ -37,4 +37,6 @@ const messagesSlice = createSlice({
   }
 });
 
+
+export const {setMessages,addMessages,resetMessages} = messagesSlice.actions;
 export default messagesSlice.reducer;
