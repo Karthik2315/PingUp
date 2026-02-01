@@ -66,6 +66,10 @@ const ChatBox = () => {
     if (!messages || messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   },[messages])
+  useEffect(()=>{
+    if (!messages || messages.length === 0) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  },[])
   return user && (
     <div className='flex flex-col min-h-screen'>
       <div className='flex items-center gap-2 p-2 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-300'>
@@ -75,7 +79,7 @@ const ChatBox = () => {
           <p className='text-slate-500 font-light text-[12px]'>@{user.username}</p>
         </div>
       </div>
-      <div className='p-5 h-[650px] overflow-y-scroll' ref={messagesEndRef} >
+      <div className='p-5 h-[650px] overflow-y-scroll' >
         <div className='space-y-4 max-w-6xl mx-auto'>
           {
             messages.toSorted((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map((message, index) => (
@@ -89,6 +93,7 @@ const ChatBox = () => {
               </div>
             ))
           }
+            <div ref={messagesEndRef} />
           <div />
         </div>
       </div>
