@@ -65,12 +65,6 @@ const PostCard = ({post}) => {
             <MessageCircle className="w-4 h-4"/>
             <span>{12}</span> {/* Hardcoded value from image */}
         </div>
-
-        {/* Share Count */}
-        <div className='flex items-center gap-1'>
-            <Share2 className="w-4 h-4"/>
-            <span>{7}</span> {/* Hardcoded value from image */}
-        </div>
       </div>
     </div>
   )
