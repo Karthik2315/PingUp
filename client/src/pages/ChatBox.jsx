@@ -9,6 +9,7 @@ import { addMessages, fetchMessages, resetMessages } from '../features/messages/
 const ChatBox = () => {
   const {userId} = useParams();
   const messages = useSelector((state)=>state.messages.messages)
+  console.log(messages)
   const {connections} = useSelector((state) => state.connections)
   const {getToken} = useAuth();
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const ChatBox = () => {
       if(data.success){
         setText('');
         setImage(null);
-        dispatch(addMessages(data.message));
+        dispatch(addMessages(data.data));
       }else{
         throw new Error(data.message)
       }
@@ -65,13 +66,9 @@ const ChatBox = () => {
   useEffect(()=>{
     if (!messages || messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  },[messages])
-  useEffect(()=>{
-    if (!messages || messages.length === 0) return;
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  },[])
+  },[messages]);
   return user && (
-    <div className='flex flex-col min-h-screen'>
+    <div className='flex-col min-h-screen'>
       <div className='flex items-center gap-2 p-2 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-300'>
         <img src={user.profile_picture} className='size-10 rounded-full'/>
         <div>

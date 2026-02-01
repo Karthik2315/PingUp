@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Routes,Route } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { Routes,Route, useLocation } from 'react-router-dom'
 import Login from './pages/Login'
 import Feed from './pages/Feed'
 import Messages from './pages/Messages'
@@ -14,10 +14,14 @@ import {Toaster} from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { fetchUser } from './features/users/userSlice.js'
 import { fetchConnections } from './features/connections/connectionSlice.js'
+import { addMessages } from './features/messages/messageSlice.js'
 const App = () => {
   const {user} = useUser()
   const {getToken} = useAuth()
   const dispatch = useDispatch();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const pathNameRef = useRef(pathname);
   useEffect(()=>{
     const fetChData = async() =>{
       if(user)
@@ -29,6 +33,25 @@ const App = () => {
     }
     fetChData();
   },[user,getToken,dispatch]) 
+  useEffect(()=>{
+    pathNameRef.current = pathname;
+  },[pathname]);
+  useEffect(()=>{
+    if(user){
+      const eventSource = new EventSource(import.meta.env.VITE_BASEURL+ '/api/message/' + user.id);
+      eventSource.onmessage = (event)=>{
+        const message = JSON.parse(event.data);
+        if(pathNameRef.current == ('/messages/' + message.from_user_id._id)){
+          dispatch(addMessages(message));
+        }else{
+          console.log("ji")
+        }
+      }
+      return ()=>{
+        eventSource.close();
+      }
+    }
+  },[user,dispatch])
   return (
     <>
       <Toaster />
