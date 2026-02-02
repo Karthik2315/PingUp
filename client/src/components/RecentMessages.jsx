@@ -2,11 +2,38 @@ import React, { useEffect, useState } from 'react'
 import { dummyRecentMessagesData } from '../assets/assets';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import {useAuth, useUser} from '@clerk/clerk-react'
+import api from '../api/axios';
 
 const RecentMessages = () => {
   const [messages,setMessages] = useState([]);
+  const {user} = useUser();
+  const {getToken} = useAuth();
   const fetchRecentMessages = async() => {
-    setMessages(dummyRecentMessagesData);
+    try {
+      const token = await getToken();
+      const {data} = await api.get('/api/user/recent-messages',{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+      if(data.success){
+        const groupedMessage = data.messages.reduce((acc,message)=>{
+          const senderId = message.from_user_id._id;
+          if(!acc[senderId] || new Date(message.createdAt) > new Date(acc[senderId].createdAt)){
+            acc[senderId] = message
+          }
+          return acc;
+        },{});
+        const sortedMessage = Object.values(groupedMessage).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+
+        setMessages(sortedMessage)
+      }else{
+        console.log(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
   useEffect(()=>{
     const fetchData = async()=>{
@@ -28,7 +55,7 @@ const RecentMessages = () => {
               </div>
               <div className='flex justify-between mt-1'>
                 <p className='text-gray-500'>{message.text ? message.text:'Media'}</p>
-                {message.seen && 
+                {!message.seen && 
                 <p className='bg-indigo-500 text-white size-4 rounded-full flex items-center justify-center text-[10px]'>1
                 </p>}
               </div>
