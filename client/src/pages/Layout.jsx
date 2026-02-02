@@ -11,7 +11,7 @@ const Layout = () => {
   return user ? (
     <div className='w-full min-h-screen flex'>
       <SideBar sidebarOpen={sidebarOpen} setSideBarOpen={setSidebarOpen}/>
-      <div className={`flex-1 bg-slate-50 ${sidebarOpen ? 'ml-61':''}`}>
+      <div className={`flex-1 bg-linear-to-r from-zinc-500 via-stone-600 to-zinc-900 ${sidebarOpen ? 'ml-60':''}`}>
         <Outlet />
       </div>
       {sidebarOpen ? 
