@@ -36,7 +36,7 @@ const Feed = () => {
     fetchData();
   },[])
   return !loading ?  (
-    <div className='w-full flex justify-between min-h-screen  py-10'>
+    <div className='w-full flex justify-between min-h-screen  py-1'>
     {/* stories and posts here */}
       <div className='w-[800px]'>
         <StoriesBar />
