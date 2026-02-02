@@ -15,6 +15,8 @@ import { useDispatch } from 'react-redux'
 import { fetchUser } from './features/users/userSlice.js'
 import { fetchConnections } from './features/connections/connectionSlice.js'
 import { addMessages } from './features/messages/messageSlice.js'
+import { toast } from 'react-hot-toast'
+import Notification from './components/Notification.jsx'
 const App = () => {
   const {user} = useUser()
   const {getToken} = useAuth()
@@ -44,7 +46,9 @@ const App = () => {
         if(pathNameRef.current == ('/messages/' + message.from_user_id._id)){
           dispatch(addMessages(message));
         }else{
-          console.log("ji")
+          toast.custom((t)=>(
+            <Notification t={t} message={message} />
+          ),{position:"bottom-right"})
         }
       }
       return ()=>{
